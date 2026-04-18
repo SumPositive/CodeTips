@@ -1,0 +1,244 @@
+#ifdef _Q&A_
+
+                             "CodeTips"
+
+                      ＤＯＳ仮想メモリ・マネジャ
+
+         O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O
+          ＶＭＭ＿Ｄｏｓ : Virtual Memory Manager for ＤＯＳ
+         O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O=O
+
+                           Version 1.3
+
+
+                             Ｑ & Ａ
+
+
+                      (C) Copyright 1989-1994
+                              ＭＳＰＯ
+                          CodeTips Project.
+
+
+
+=====================================================================
+Ｑ．コンパイラは出来るのですが、出来上がったプログラムを走らせると
+　　１５Ｋバイト程度しかデーターが扱えない。
+　　以下がテストように作ったプログラムです。
+
+機種　　　　　　：ＰＣ－３８６Ｍ
+メモリ　　　　　：プロテクトメモリ２Ｍ
+ＯＳ　　　　　　：ＭＳ－ＤＯＳ５
+コンパイラ　　　：ＭＳ－ＱＵＩＣＫ－Ｃ
+
+#include <vm_dos.h>
+#include <string.h>
+#include <dos.h>
+#include <graph.h>
+main()
+{
+    char *pz;
+    VMHAND vh;
+    int (*errFUNC)(int,char*);
+    
+    graphset();
+    _moveto(0,50);_lineto(639,50);
+    
+    vm_init(0,VM_ALLDOS,VM_EMS,2,errFUNC);
+    vh=vm_alloc(2000);
+    
+    pz=(char *)vm_load(vh,VM_DIRTY);
+    _getimage(0,0,300,100,pz);   /* 4+(((300+1)*4+7)/8)*(100+1)=15293 */
+    _clearscreen(_GCLEARGRAPH);
+    getch();
+    pz=(char f*)vm_load(vh,VM_CLEAN);
+    _putimage(0,0,pz,_GPSET);
+    
+    vm_free(vh);
+    vm_term();
+}
+---------------------------------------------------------------------
+Ａ．ページサイズは、確保するブロックのサイズよりも十分大きくなければな
+    りません。
+　　vh=vm_alloc(2000);ならば、少なくとも４Ｋできれば８Ｋが良いでしょう。
+　  vm_init(0,VM_ALLDOS,VM_EMS, ８, errFUNC); として下さい。
+　  それと、errFUNC()は、どこかに記述してあるのでしょうか？
+　　その他の使い方は、完璧です。
+
+=====================================================================
+Ｑ．エディタとの相性の問題でしょうかプログラム修正の後は、
+　　エディタを再起動しないと動きません。
+　　それと、出来上がったプログラムをコマンドライン上で起動しても正
+　　常に作動しません。
+
+機種　　　　　　：ＰＣ－３８６Ｍ
+メモリ　　　　　：プロテクトメモリ２Ｍ（内ＥＭＳメモリー６８０Ｋバイト）
+ＯＳ　　　　　　：ＭＳ－ＤＯＳ５
+コンパイラ　　　：ＭＳ－ＱＵＩＣＫ－Ｃ
+
+#include <vm_dos.h>
+#include <malloc.h>
+#include <dos.h>
+#include <graph.h>
+
+main()
+{
+    void far *pz1,far *pz2,far *pz3,far *pz4,far *pz5,
+         far *pz6,far *pz7,far *pz8;
+    VMHAND vh1,vh2,vh3,vh4,vh5,vh6,vh7,vh8;
+    int (*errFUNC)(int,char*);
+    char far *ima;
+    
+    graphset();
+    _moveto(0,0);_lineto(639,399);
+    vm_init(0,VM_ALLDOS,VM_EMS,16,errFUNC);
+    
+    vh1=vm_alloc(16000);
+    pz1=(char far *)vm_load(vh1,VM_DIRTY);
+    _getimage(0,0,639,50,pz1);
+    vh2=vm_alloc(16000);
+    pz2=(char far *)vm_load(vh2,VM_DIRTY);
+    _getimage(0,51,639,100,pz2);
+    vh3=vm_alloc(16000);
+    pz3=(char far *)vm_load(vh3,VM_DIRTY);
+    _getimage(0,101,639,150,pz3);
+    vh4=vm_alloc(16000);
+    pz4=(char far *)vm_load(vh4,VM_DIRTY);
+    _getimage(0,151,639,200,pz4);
+    vh5=vm_alloc(16000);
+    pz5=(char far *)vm_load(vh5,VM_DIRTY);
+    _getimage(0,201,639,250,pz5);
+    vh6=vm_alloc(16000);
+    pz6=(char far *)vm_load(vh6,VM_DIRTY);
+    _getimage(0,251,639,300,pz6);
+    vh7=vm_alloc(16000);
+    pz7=(char far *)vm_load(vh7,VM_DIRTY);
+    _getimage(0,301,639,350,pz7);
+    vh8=vm_alloc(16000);
+    pz8=(char far *)vm_load(vh8,VM_DIRTY);
+    _getimage(0,351,639,399,pz8);
+    
+    getch();
+    _clearscreen(_GCLEARGRAPH);
+    getch();
+    
+    pz1=(char far *)vm_load(vh1,VM_CLEAN);
+    _putimage(0,0,pz1,_GPSET);
+    pz2=(char far *)vm_load(vh2,VM_CLEAN);
+    _putimage(0,51,pz2,_GPSET);
+    pz3=(char far *)vm_load(vh3,VM_CLEAN);
+    _putimage(0,101,pz3,_GPSET);
+    pz4=(char far *)vm_load(vh4,VM_CLEAN);
+    _putimage(0,151,pz4,_GPSET);
+    pz5=(char far *)vm_load(vh5,VM_CLEAN);
+    _putimage(0,201,pz5,_GPSET);
+    pz6=(char far *)vm_load(vh6,VM_CLEAN);
+    _putimage(0,251,pz6,_GPSET);
+    pz7=(char far *)vm_load(vh7,VM_CLEAN);
+    _putimage(0,301,pz7,_GPSET);
+    pz8=(char far *)vm_load(vh8,VM_CLEAN);
+    _putimage(0,351,pz8,_GPSET);
+    
+    ima=(char far *)halloc(210000L,sizeof(char));/*本当にメモリーを食ってな
+    　　　　　　　　　　　　　　　　　　　　　　　　　　　いか調べる*/
+    if(ima==0){puts("no");}else{puts("ok");}
+    hfree(ima);
+    
+    vm_free(vh1);
+    vm_free(vh2);
+    vm_free(vh3);
+    vm_free(vh4);
+    vm_free(vh5);
+    vm_free(vh6);
+    vm_free(vh7);
+    vm_free(vh8);
+    vm_term();
+}
+---------------------------------------------------------------------
+Ａ．これは、デバッグモードを評価して頂く絶好のチャンスです。
+  　コンパイラオプション /D_AP_DEBUG を付けてコンパイルして下さい。
+
+  　オーバーライトが報告されるはずです。
+  　このオーバーライトによって、エディタが動作不良を起こしたのでしょう。
+
+  _getimage(0,0,639,50,pz1); これに必要なメモリは、少なくとも 1600バ
+  イトより多いはずです。
+  _imagesize();を用いれば、正確なサイズが解ります。
+
+　ただし、ページ１６Ｋ や 1600バイトをアロケートするのはお薦めできません。
+　ＶＭＭ＿Ｄｏｓは、ページやブロックのサイズが小さいほど効率が良くなります。
+　ブロックのサイズには限りが有りますが、数は実質無限大です。
+
+　例えば、このような方法はどうでしょうか。
+
+    #define YSTEP  5
+    
+    WORD  wSize;
+    int   y;
+    char far *pz;
+    VMHAND  vhTop, vh, *pvh;
+    
+    /* SAVE */
+    wSize = sizeof(VMHAND) + (WORD)_imagesize(0,0, 639,YSTEP);
+    for( vhTop=VM_NULL, y=0 ; y<400 ; y += YSTEP )
+    {
+        vh = vm_alloc( wSize );
+        pz = (char far *)vm_load(vh,VM_DIRTY);
+        
+        pvh = (VMHAND *)pz;
+        *pvh = vhTop;    /* リンク・ハンドルを書き込む */
+        
+        _getimage(0,y,639,y+YSTEP, (char _huge *)(pvh+1) );
+        
+        vhTop = vh;
+    }
+    
+    getch();
+    _clearscreen(_GCLEARGRAPH);
+    getch();
+    
+    /* LOAD */
+    wSize = sizeof(VMHAND) + (WORD)_imagesize(0,0, 639,YSTEP); /* 同じ */
+    for( vh=vhTop, y=400-YSTEP ; 0<=y ; y -= YSTEP )  /* 逆になっている */
+    {
+        pz = (char far *)vm_load(vh,VM_CLEAN);
+        
+        pvh = (VMHAND *)pz;
+        vh = *pvh;    /* 次のハンドルです */
+        
+        _putimage(0,y, (char _huge *)(pvh+1), _GPSET);
+    }
+
+　直接メールに書き込んだために、動作確認はしていません。
+　参考程度にして下さい。
+
+　最後に、/*本当にメモリーを食ってないか調べる*/ についてですが、
+ユーザーズ・ガイドにある、[動作原理]に簡単に説明しているように、使用中の
+ページは、コンベンショナル・メモリ（ヒープ）に存在します。そうしないとポ
+インタ参照ができません。
+　また、初期化で vm_init( ,VM_ALLDOS,,, );を指定すれば、すべてのヒープ
+を使用許可したことになります。
+　例えば、vm_init( , 64,,, );にすれば、ＶＭＭは、６４Ｋのヒープだけを
+使ってやりくりします。
+　使用許可ヒープサイズは、ページサイズよりも十分大きくしたほうが高効率です。
+　ただし、ＶＭＭ＿Ｄｏｓは、ヒープが少ないほど Microsoft C7 付属の _v関数を
+超越する性能を発揮します。
+
+=====================================================================
+Ｑ． vm_init(0,0,VM_EMS,8,errFUNC);
+            (0,0,...)でも問題なく動くので(0,0...)にしています。
+     よろしいのでしょうか？
+---------------------------------------------------------------------
+Ａ．最初の０は、ＶＭＭに与える最小のヒープメモリ容量を指示します。
+    ０ということは、もし、ヒープメモリに空きが全くなくても vm_init()は
+    正常にﾘﾀｰﾝしますが、最初のアロケート(vm_allocなど)でエラーが発生し
+    ます。
+    ほとんどの場合０で問題ありません。
+
+    次の０は、ＶＭＭに使用許可するヒープメモリ容量を指示します。
+    ０は、現ﾊﾞｰｼﾞｮﾝでは、VM_ALLDOS の定義値と同じです。
+    つまり、全てのヒープメモリを利用します。
+
+=====================================================================
+
+#endif
+

@@ -1,0 +1,95 @@
+#
+# サンプルＭＡＫＥＦＩＬＥ
+# make.BC                         Borland MAKE 仕様
+#
+# WinAlloc
+#
+# その他の MAKE を御使用の場合など、これを参考にして作成して下さい。
+#
+# 使用法： MAKE -fmake.BC
+#
+# 環境変数： INCLUDE = インクルードファイル・パス
+#                LIB = ライブラリファイル・パス
+#
+#--------------------------------------------------------------------
+# MODEL & TYPE:
+
+TYPE=A    # Compile Type    [ Pro | Ama ]
+MODEL=c   # Compile Model   [ large | compact | medium | small ]
+DEBUG=0   # Debug [0]OFF  [1]ON 
+
+#--------------------------------------------------------------------
+# Compiler Option:
+
+CFLAGS=-c -W -m$(MODEL) -K -d -w-eff -2  -I$(INCLUDE)
+LFLAGS=/c /Twe /L$(LIB) C0W$(MODEL)
+
+LIBS=WAC_$(MODEL)$(TYPE).lib 
+
+!if $(DEBUG)==1
+CFLAGS=$(CFLAGS) -D_AP_DEBUG -Od 
+LFLAGS=$(LFLAGS)
+!else
+CFLAGS=$(CFLAGS) -DNDEBUG -O2 
+LFLAGS=$(LFLAGS)
+!endif
+
+
+#BC2
+#LIBS=$(LIBS) CWIN$(MODEL) IMPORT  C$(MODEL) MATH$(MODEL)
+
+#BC3
+LIBS=$(LIBS) CW$(MODEL) IMPORT  MATH$(MODEL)
+
+
+OBJS=wAlloc.obj wPuts.obj wDebug1.obj wDebug2.obj wDebug3.obj \
+		wBench1.obj wBench2.obj wBench3.obj
+
+#--------------------------------------------------------------------
+# Command:
+
+all:    wAlloc.exe  
+
+
+# --------------------------------------------------
+wAlloc.exe:  $(OBJS) wAlloc.def wAlloc.res
+	Tlink @&&!
+$(LFLAGS) $(OBJS)
+wAlloc
+wAlloc
+$(LIBS)
+wAlloc.def
+!
+	rc -t  wAlloc.res
+
+
+# --------------------------------------------------
+.c.obj:
+	bcc $(CFLAGS) -w-rch -w-aus  $*.c
+
+wAlloc.obj:  wAlloc.c  WinAlloc.h
+
+wPuts.obj:  wPuts.c  WinAlloc.h
+
+wDebug1.obj:  wDebug1.c  WinAlloc.h
+
+wDebug2.obj:  wDebug2.c  WinAlloc.h
+
+wDebug3.obj:  wDebug3.c  WinAlloc.h
+
+wBench1.obj:  wBench1.c  WinAlloc.h
+
+wBench2.obj:  wBench2.c  WinAlloc.h
+
+wBench3.obj:  wBench3.c  WinAlloc.h
+
+
+# --------------------------------------------------
+.rc.res:
+    rc -r $*.rc
+
+wAlloc.res:  wAlloc.rc wAlloc.h
+
+
+# --- end ---
+

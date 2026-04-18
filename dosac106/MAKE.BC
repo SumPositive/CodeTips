@@ -1,0 +1,63 @@
+#
+# サンプルＭＡＫＥＦＩＬＥ
+# make.BC                         Borland MAKE 仕様
+#
+# その他の MAKE を御使用の場合など、これを参考にして作成して下さい。
+#
+# DosAlloc
+#
+# 使用法： MAKE -fmake.BC
+#
+# 環境変数： INCLUDE = インクルードファイル・パス
+#                LIB = ライブラリファイル・パス
+#
+#--------------------------------------------------------------------
+# MODEL & TYPE:
+
+TYPE=A    # Compile Type    [ Pro | Ama ]
+MODEL=c   # Compile Model   [ large | compact | medium | small ]
+DEBUG=0   # Debug [0]OFF  [1]ON 
+
+#--------------------------------------------------------------------
+# Compiler Option:
+
+CFLAGS=-c -m$(MODEL) -K -d -w-eff -a -I$(INCLUDE)
+LFLAGS=-c -d -L$(LIB)
+
+!if $(TYPE)=='P'
+LIBS=DAC_$(MODEL)P.lib     #（製品開発版）
+!else
+LIBS=DAC_$(MODEL)A.lib     #（個人学習版）
+!endif
+
+!if $(DEBUG)==1
+CFLAGS=$(CFLAGS) -D_AP_DEBUG -O2 
+LFLAGS=$(LFLAGS)
+!else
+CFLAGS=$(CFLAGS) -DNDEBUG -O2 
+LFLAGS=$(LFLAGS)
+!endif
+
+
+#--------------------------------------------------------------------
+# Command:
+
+all:  da_rand.exe  da_max.exe  da_bench.exe  da_mix.exe
+
+
+#--------------------------------------------------------------------
+.c.exe:
+	bcc $(CFLAGS) $*.c
+	Tlink $(LFLAGS) C0$(MODEL) $*,$*,NUL,$(LIBS) EMU MATH$(MODEL) C$(MODEL)
+
+da_rand.exe:  da_rand.c
+
+da_bench.exe:  da_bench.c
+
+da_max.exe:  da_max.c
+
+da_mix.exe:  da_mix.c
+
+
+# --- end ---
+

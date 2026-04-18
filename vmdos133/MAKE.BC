@@ -1,0 +1,59 @@
+#
+# サンプルＭＡＫＥＦＩＬＥ
+# make.BC                         Borland MAKE 仕様
+#
+# その他の MAKE を御使用の場合など、これを参考にして作成して下さい。
+#
+# VMM_DOS
+#
+# 使用法： MAKE -fmake.BC
+#
+# 環境変数： INCLUDE = インクルードファイル・パス
+#                LIB = ライブラリファイル・パス
+#
+#--------------------------------------------------------------------
+# MODEL & TYPE:
+
+TYPE=A    # Compile Type    [ Pro | Ama ]
+MODEL=c   # Compile Model   [ large | compact | medium | small ]
+DEBUG=0   # Debug [0]OFF  [1]ON 
+
+#--------------------------------------------------------------------
+# Compiler Option:
+
+CFLAGS=-c -m$(MODEL) -K -d -w-eff -a -I$(INCLUDE)
+LFLAGS=-c -d -L$(LIB)
+
+LIBS=VMM_$(MODEL)$(TYPE).lib 
+
+!if $(DEBUG)==1
+CFLAGS=$(CFLAGS) -D_AP_DEBUG -O2 
+LFLAGS=$(LFLAGS)
+!else
+CFLAGS=$(CFLAGS) -DNDEBUG -O2 
+LFLAGS=$(LFLAGS)
+!endif
+
+
+#--------------------------------------------------------------------
+# Command:
+
+all:  vm_rand.exe  vm_max.exe  vm_bench.exe  vm_mix.exe
+
+
+#--------------------------------------------------------------------
+.c.exe:
+	bcc $(CFLAGS) $*.c
+	Tlink $(LFLAGS) C0$(MODEL) $*,$*,NUL,$(LIBS) EMU MATH$(MODEL) C$(MODEL)
+
+vm_rand.exe:  vm_rand.c
+
+vm_bench.exe:  vm_bench.c
+
+vm_max.exe:  vm_max.c
+
+vm_mix.exe:  vm_mix.c
+
+
+# --- end ---
+

@@ -1,0 +1,57 @@
+#
+# サンプルＭＡＫＥＦＩＬＥ
+# make.BC                         Borland MAKE 仕様
+#
+# その他の MAKE を御使用の場合など、これを参考にして作成して下さい。
+#
+# class NewDely for DOS
+#
+# 使用法： MAKE -fmake.BC
+#
+# 環境変数： INCLUDE = インクルードファイル・パス
+#                LIB = ライブラリファイル・パス
+#
+#--------------------------------------------------------------------
+# MODEL & TYPE:
+
+TYPE=F    # Compile Type    [ Pro | Ama | Free ]
+MODEL=s   # Compile Model   [ large | compact | medium | small ]
+DEBUG=0   # Debug [0]OFF  [1]ON 
+
+#--------------------------------------------------------------------
+# Compiler Option:
+
+CFLAGS=-c -m$(MODEL) -K -d -w-eff -a -I$(INCLUDE)
+LFLAGS=-c -d -L$(LIB)
+
+LIBS=NDD_$(MODEL)$(TYPE).lib 
+
+!if $(DEBUG)==1
+CFLAGS=$(CFLAGS) -D_AP_DEBUG -O2 
+LFLAGS=$(LFLAGS)
+!else
+CFLAGS=$(CFLAGS) -DNDEBUG -O2 
+LFLAGS=$(LFLAGS)
+!endif
+
+
+#--------------------------------------------------------------------
+# Command:
+
+all:  nd_max.exe  nd_bench.exe  nd_mix.exe
+
+
+#--------------------------------------------------------------------
+.cpp.exe:
+	bcc $(CFLAGS) $*.cpp
+	Tlink $(LFLAGS) C0$(MODEL) $*,$*,NUL,$(LIBS) EMU MATH$(MODEL) C$(MODEL)
+
+nd_bench.exe:  nd_bench.cpp
+
+nd_max.exe:  nd_max.cpp
+
+nd_mix.exe:  nd_mix.cpp
+
+
+# --- end ---
+

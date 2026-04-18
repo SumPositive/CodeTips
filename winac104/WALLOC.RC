@@ -1,0 +1,35 @@
+#include "windows.h"
+#include "Walloc.h"
+
+WallocMenu MENU
+BEGIN
+    POPUP        "デバッグテスト(\036D\037ﾃ)"
+    BEGIN
+        MENUITEM "シーケンシャル", 	IDM_DEB_1
+        MENUITEM "ランダム", 		IDM_DEB_2
+        MENUITEM "ミックス", 		IDM_DEB_3
+    END
+    
+    POPUP        "ベンチマークテスト(\036B\037ﾍ)"
+    BEGIN
+        MENUITEM "ランダム", 		IDM_BENCH_1
+        MENUITEM "ミックス", 		IDM_BENCH_2
+        MENUITEM "マックス", 		IDM_BENCH_3
+    END
+    
+    POPUP        "ヘルプ(\036H\037ﾍ)"
+    BEGIN
+        MENUITEM "バージョン情報(\036A\037ｼ)...", 	IDM_ABOUT
+    END
+END
+
+AboutBox DIALOG 22, 17, 144, 75
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "Wallocのバージョン情報"
+BEGIN
+    CTEXT "CodeTips"            -1,       0,  5, 144,  8
+    CTEXT "WinAlloc Sample"     -1,       0, 14, 144,  8
+    CTEXT "Version 1.0"         -1,       0, 34, 144,  8
+    DEFPUSHBUTTON "OK"        IDOK,      53, 59,  32, 14,      WS_GROUP
+END
+
